@@ -11,8 +11,8 @@ import numpy as np
 
 train_transform = v2.Compose([
     v2.ToTensor(),
-    v2.RandomResizedCrop(48),
-    v2.RandomHorizontalFlip(0.3),
+    v2.RandomResizedCrop(48), #Crop the image
+    v2.RandomHorizontalFlip(0.3), 
     v2.Grayscale(num_output_channels=1),
     v2.ToImage(),
     v2.ToDtype(torch.float32, scale=True) 
@@ -43,7 +43,7 @@ train_dataset = datasets.ImageFolder(os.path.join(root, 'train'), transform=trai
 test_dataset = datasets.ImageFolder(os.path.join(root, 'test'), transform=test_transform)
 val_dataset = datasets.ImageFolder(os.path.join(root, 'val'), transform=test_transform)
 
-train_loader = DataLoader(train_dataset, batch_size=100, shuffle=True)
+train_loader = DataLoader(train_dataset, batch_size=100, shuffle=True) #Batchsize 100 to display 100 images later
 val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
@@ -61,17 +61,22 @@ plt.show()
 #----------------------loop dataloader--------------------------------
 
 #-----------------train-------------------
-for inputs, output in train_loader:
-    print("Train Input Shape:", inputs.shape) 
-    print("Train Output Labels:", output)
+for inputs, outputs in train_loader:
+    print("Train:\n")
+    print(f"Input Data:\n{inputs}")     
+    print(f"Output Labels:\n{outputs}") 
+    break #Just to make sure we output once
+
+# ----------------------Test----------------------------
+for inputs, outputs in test_loader:
+    print("Test:\n")
+    print(f"Input Data:\n{inputs}")
+    print(f"Output Labels:\n{outputs}")
     break 
-#--------------Test-----------------------
-for inputs1, output1 in test_loader:
-    print("Test Input Shape:", inputs1.shape)
-    print("Test Output Labels:", output1)
-    break 
-#-------------------Val-----------------------
-for inputs2, output2 in val_loader:
-    print("Val Input Shape:", inputs2.shape)
-    print("Val Output Labels:", output2)
-    break 
+
+#------------------Val-------------------
+for inputs, outputs in val_loader:
+    print("Val:\n")
+    print(f"Input Data:\n{inputs}")
+    print(f"Output Labels:\n{outputs}")
+    break
