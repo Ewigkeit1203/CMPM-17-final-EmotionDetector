@@ -1,5 +1,7 @@
 import os
 import torch
+import torch.nn as nn
+import torch.optim as optim
 import matplotlib.pyplot as plt
 from PIL import Image
 from torch.utils.data import DataLoader
@@ -11,7 +13,6 @@ import numpy as np
 
 train_transform = v2.Compose([
     v2.ToTensor(),
-    v2.RandomResizedCrop(48), #Crop the image
     v2.RandomHorizontalFlip(0.3), 
     v2.Grayscale(num_output_channels=1),
     v2.ToImage(),
@@ -20,7 +21,6 @@ train_transform = v2.Compose([
 
 test_transform = v2.Compose([
     v2.ToTensor(),
-    v2.RandomResizedCrop(48),
     v2.Grayscale(num_output_channels=1),
     v2.ToImage(),
     v2.ToDtype(torch.float32, scale=True)
@@ -80,3 +80,29 @@ for inputs, outputs in val_loader:
     print(f"Input Data:\n{inputs}")
     print(f"Output Labels:\n{outputs}")
     break
+
+#-------------init-----------------
+class ConvNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv2d(1,16,3,1,1)
+        self.conv2 = nn.Conv2d(16,32,3,1,1)
+        self.conv3 = nn.Conv2d(32,64,3,1,1)
+        self.pool = nn.MaxPool2d(2,2)
+        self.fc1 = nn.Linear(2304, 128)
+        self.fc2 = nn.Linear(128, 6)
+        self.relu = nn.ReLU()
+
+
+#--------------forward-----------------
+    def forward(self, X):
+        X = self.relu(self.conv1(X))
+        X = self.pool(X)
+        X = self.relu(self.conv2(X))
+        X = self.pool(X)
+        X = self.relu(self.conv3(X))
+        X = self.pool(X)
+        X = X.flatten(start_dim=1)
+        X = self.relu(self.fc1(X))
+        output = self.fc2(X)
+        return output
