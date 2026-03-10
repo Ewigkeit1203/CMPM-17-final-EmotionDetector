@@ -106,3 +106,45 @@ class ConvNet(nn.Module):
         X = self.relu(self.fc1(X))
         output = self.fc2(X)
         return output
+    
+
+
+model = ConvNet()
+model.train()
+loss_function = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr = 0.00001)
+EPOCHS = 3
+
+#-------------training loop-------------
+for i in range(EPOCHS):  
+
+    for train_x, train_y in train_loader:  
+        model.train()
+        loss = 0
+        pred = model(images)  
+        pred = pred.to(torch.float)
+        train_y = train_y.to(torch.float)
+        loss = loss_function(pred, train_y) 
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+        loss += loss.item()
+ 
+    avg_loss = loss / len(train_loader) 
+    print(f"training loss: {avg_loss} | EPOCHS: {i}")
+
+
+#-------------testing loop------------------
+
+total_loss = 0
+total_preds = 0
+total_correct = 0
+
+for x, y in test_loader:
+    test_preds = model(x)
+    total_loss = loss_function(pred, train_y) 
+    total_loss += loss.item()
+total_preds += test_preds.item()
+avg_loss = total_loss / len(test_loader)
+total_correct = loss_function(pred, y)
+print(f"avg loss: {avg_loss} | total loss: {total_loss} | total correct: {total_correct} | total preds: {total_preds}")
